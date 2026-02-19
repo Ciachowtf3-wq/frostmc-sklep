@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FrostMC — Sklep</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────
+   FROSTMC — Ocean / Ice / Abyssal dark theme
+   Zero AI slop. Hand-crafted.
+───────────────────────────────────────────── */
+:root {
+  --ice:    #a8d8f0;
+  --ice2:   #5bb8e8;
+  --ocean:  #0b4c6e;
+  --deep:   #061e2e;
+  --abyss:  #040f18;
+  --frost:  #c8eeff;
+  --teal:   #00c8b4;
+  --teal2:  #008f7f;
+  --snow:   #e8f4fc;
+  --muted:  #4a7a9b;
+  --card:   #071623;
+  --border: #0d2d42;
+  --danger: #e05555;
+  --gold:   #f0c040;
+  --text:   #cce8f8;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--abyss);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  overflow-x: hidden;
+  /* Subtle hex grid texture */
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 17.3 L60 34.6 L30 52 L0 34.6 L0 17.3Z' fill='none' stroke='%230d2d42' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 60px 52px;
+}
+
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background: var(--abyss); }
+::-webkit-scrollbar-thumb { background: var(--ocean); border-radius:99px; }
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position:fixed; inset:0; z-index:0;
+  pointer-events:none; opacity:.6;
+}
+
+/* ── NAV ── */
+header {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  height:58px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 2.5rem;
+  background: rgba(4,15,24,.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--frost);
+  display:flex; align-items:center; gap:.5rem;
+}
+.logo-dot {
+  width:8px; height:8px; border-radius:50%;
+  background: var(--teal);
+  box-shadow: 0 0 10px var(--teal);
+}
+
+nav { display:flex; align-items:center; gap:.2rem; }
+nav a {
+  font-family:'DM Mono',monospace; font-size:.7rem;
+  color: var(--muted); text-decoration:none;
+  padding:.35rem .9rem; border-radius:4px;
+  letter-spacing:.5px; text-transform:uppercase;
+  transition: color .2s, background .2s;
+}
+nav a:hover { color:var(--ice); background:rgba(91,184,232,.07); }
+
+.nav-actions { display:flex; align-items:center; gap:.6rem; }
+
+.btn-ghost {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color:var(--muted); background:transparent;
+  border:1px solid var(--border); border-radius:4px;
+  padding:.32rem .85rem; cursor:pointer; letter-spacing:.5px;
+  text-transform:uppercase; transition: all .2s;
+}
+.btn-ghost:hover { color:var(--ice); border-color:var(--ice2); }
+
+.btn-solid {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  color: var(--abyss); background:var(--ice2);
+  border:1px solid var(--ice2); border-radius:4px;
+  padding:.32rem .85rem; cursor:pointer; letter-spacing:.5px;
+  text-transform:uppercase; transition: all .2s;
+}
+.btn-solid:hover { background:var(--frost); border-color:var(--frost); }
+
+/* admin-btn usuniety - uzyj Ctrl+Shift+A */
+
+#nav-user {
+  font-family:'DM Mono',monospace; font-size:.7rem;
+  color:var(--teal); display:none; align-items:center; gap:.4rem;
+}
+#nav-user::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); }
+
+/* ── HERO ── */
+.hero {
+  position:relative; z-index:1;
+  min-height: 100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:7rem 2rem 4rem;
+  overflow:hidden;
+}
+
+/* Ice crack lines */
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    linear-gradient(135deg, transparent 48%, rgba(91,184,232,.04) 49%, transparent 51%),
+    linear-gradient(225deg, transparent 48%, rgba(91,184,232,.03) 49%, transparent 51%),
+    radial-gradient(ellipse 70% 50% at 50% 60%, rgba(11,76,110,.35) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.hero-eyebrow {
+  font-family:'DM Mono',monospace; font-size:.7rem;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:1.5rem;
+  display:flex; align-items:center; gap:.7rem;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content:''; flex:1; max-width:60px; height:1px;
+  background:linear-gradient(90deg, transparent, var(--border));
+}
+.hero-eyebrow::after { background:linear-gradient(90deg, var(--border), transparent); }
+
+.hero h1 {
+  font-family:'Syne', sans-serif;
+  font-weight:800;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  line-height: 1.0;
+  letter-spacing: -2px;
+  color: var(--frost);
+  margin-bottom: 1.2rem;
+}
+.hero h1 em {
+  font-style:normal;
+  color:transparent;
+  -webkit-text-stroke: 1.5px var(--ice2);
+}
+
+.hero-sub {
+  font-size:1.05rem;
+  color:var(--muted);
+  max-width:480px;
+  line-height:1.8;
+  margin-bottom:2.5rem;
+}
+
+.hero-cta { display:flex; gap:.8rem; flex-wrap:wrap; justify-content:center; margin-bottom:4rem; }
+
+.cta-primary {
+  font-family:'DM Mono',monospace; font-size:.78rem;
+  background: linear-gradient(135deg, var(--ocean), var(--ice2));
+  color:#fff; border:none; border-radius:6px;
+  padding:.8rem 2rem; cursor:pointer; letter-spacing:.5px;
+  text-transform:uppercase; text-decoration:none; display:inline-block;
+  transition: all .25s;
+  box-shadow: 0 0 30px rgba(91,184,232,.2), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.cta-primary:hover {
+  transform:translateY(-2px);
+  box-shadow: 0 8px 40px rgba(91,184,232,.35);
+}
+
+.cta-sec {
+  font-family:'DM Mono',monospace; font-size:.78rem;
+  color:var(--muted); background:transparent;
+  border:1px solid var(--border); border-radius:6px;
+  padding:.8rem 2rem; cursor:pointer; letter-spacing:.5px;
+  text-transform:uppercase; text-decoration:none; display:inline-block;
+  transition: all .25s;
+}
+.cta-sec:hover { color:var(--ice); border-color:var(--muted); }
+
+/* Stats */
+.hero-stats {
+  display:flex; gap:3.5rem; flex-wrap:wrap; justify-content:center;
+  padding-top:2rem; border-top:1px solid var(--border);
+}
+.stat-item { text-align:center; }
+.stat-num {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:2rem; color:var(--frost);
+  display:block; letter-spacing:-1px;
+}
+.stat-label {
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  color:var(--muted); letter-spacing:2px; text-transform:uppercase;
+  margin-top:.3rem;
+}
+
+/* ── SECTION ── */
+section { position:relative; z-index:1; padding:5rem 2rem; }
+.sec-header { margin-bottom:3rem; }
+.sec-tag {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  color:var(--teal); letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:.6rem; display:block;
+}
+.sec-title {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:clamp(1.6rem,4vw,2.5rem);
+  color:var(--frost); letter-spacing:-1px;
+}
+
+/* ── TABS ── */
+.tabs {
+  display:flex; gap:0; margin-bottom:2.5rem;
+  border:1px solid var(--border); border-radius:6px;
+  width:fit-content; overflow:hidden;
+}
+.tab {
+  font-family:'DM Mono',monospace; font-size:.68rem;
+  padding:.55rem 1.6rem; cursor:pointer; border:none;
+  background:transparent; color:var(--muted);
+  letter-spacing:.5px; text-transform:uppercase;
+  transition: all .2s; border-right:1px solid var(--border);
+}
+.tab:last-child { border-right:none; }
+.tab.on { background:rgba(91,184,232,.12); color:var(--ice); }
+.tab:hover:not(.on) { color:var(--text); background:rgba(255,255,255,.03); }
+
+/* ── SHOP GRID ── */
+.shop-section { display:none; }
+.shop-section.on { display:block; }
+
+.shop-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px,1fr));
+  gap:1.2rem; max-width:1140px; margin:0 auto;
+}
+
+/* ── PRODUCT CARD ── */
+.pcard {
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:1.6rem;
+  cursor:pointer; transition: all .25s;
+  display:flex; flex-direction:column;
+  position:relative; overflow:hidden;
+}
+.pcard::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: var(--card-accent, linear-gradient(90deg, var(--ice2), var(--teal)));
+  opacity:0; transition: opacity .3s;
+}
+.pcard:hover { border-color:rgba(91,184,232,.3); transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.4), 0 0 20px rgba(91,184,232,.08); }
+.pcard:hover::before { opacity:1; }
+
+/* rank accent overrides */
+.r-vip   { --card-accent: #22c55e; }
+.r-svip  { --card-accent: var(--ice2); }
+.r-mvp   { --card-accent: var(--gold); }
+.r-mvpp  { --card-accent: #a78bfa; }
+.r-key   { --card-accent: var(--muted); }
+.r-keygold { --card-accent: var(--gold); }
+.r-keydiam { --card-accent: var(--teal); }
+
+.pcard::before { background: var(--card-accent); }
+
+.badge {
+  position:absolute; top:1rem; right:1rem;
+  font-family:'DM Mono',monospace; font-size:.58rem;
+  padding:.2rem .55rem; border-radius:3px; letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.b-hot  { background:rgba(240,80,40,.15); color:#f05828; border:1px solid rgba(240,80,40,.3); }
+.b-new  { background:rgba(0,200,180,.12); color:var(--teal); border:1px solid rgba(0,200,180,.3); }
+.b-sale { background:rgba(240,192,64,.1); color:var(--gold); border:1px solid rgba(240,192,64,.3); }
+
+.pcard-icon { font-size:2.2rem; margin-bottom:.9rem; display:block; }
+.pcard-cat  { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:.3rem; }
+.pcard-name {
+  font-family:'Syne',sans-serif; font-weight:700;
+  font-size:1.3rem; margin-bottom:.9rem;
+}
+.r-vip   .pcard-name { color:#22c55e; }
+.r-svip  .pcard-name { color:var(--ice2); }
+.r-mvp   .pcard-name { color:var(--gold); }
+.r-mvpp  .pcard-name { color:#a78bfa; }
+.r-key   .pcard-name,
+.r-keygold .pcard-name,
+.r-keydiam .pcard-name { color:var(--snow); }
+
+.perk-list { list-style:none; flex:1; margin-bottom:1.2rem; display:flex; flex-direction:column; gap:.35rem; }
+.perk-list li {
+  font-size:.92rem; color:var(--muted);
+  display:flex; align-items:center; gap:.5rem;
+}
+.perk-list li::before { content:'·'; color:var(--teal); font-size:1.2rem; line-height:1; flex-shrink:0; }
+
+.pcard-foot { display:flex; align-items:center; justify-content:space-between; padding-top:1rem; border-top:1px solid var(--border); }
+.price-old { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); text-decoration:line-through; display:block; }
+.price-now { font-family:'Syne',sans-serif; font-weight:700; font-size:1.25rem; color:var(--frost); }
+
+.btn-buy {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  background: rgba(91,184,232,.12); color:var(--ice);
+  border:1px solid rgba(91,184,232,.25); border-radius:5px;
+  padding:.45rem 1rem; cursor:pointer; letter-spacing:.5px;
+  text-transform:uppercase; transition: all .2s;
+}
+.btn-buy:hover { background:rgba(91,184,232,.22); border-color:var(--ice2); }
+
+/* ── HOW IT WORKS ── */
+#how { background:rgba(6,30,46,.5); }
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.5rem; max-width:960px; }
+.step {
+  padding:1.6rem;
+  background:var(--card); border:1px solid var(--border); border-radius:8px;
+}
+.step-n {
+  font-family:'Syne',sans-serif; font-weight:800;
+  font-size:2.5rem; color:var(--border); letter-spacing:-2px;
+  display:block; margin-bottom:.8rem; line-height:1;
+}
+.step h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:var(--frost); margin-bottom:.5rem; }
+.step p  { font-size:.9rem; color:var(--muted); line-height:1.7; }
+
+/* ── FOOTER ── */
+footer {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border);
+  padding:2rem 2.5rem;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:1rem;
+}
+.footer-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; color:var(--frost); }
+footer p { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); }
+
+/* ─────────────────────────────────────────────
+   MODALS / OVERLAYS
+───────────────────────────────────────────── */
+.overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(2,8,14,.9);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:1rem;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.overlay.open { opacity:1; pointer-events:all; }
+
+.modal {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:2rem;
+  width:100%; max-width:440px;
+  position:relative;
+  transform:translateY(12px); transition:transform .25s;
+  max-height:90vh; overflow-y:auto;
+}
+.overlay.open .modal { transform:translateY(0); }
+
+.modal-x {
+  position:absolute; top:1rem; right:1rem;
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  color:var(--muted); border-radius:4px;
+  width:28px; height:28px; cursor:pointer; font-size:.9rem;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.modal-x:hover { color:var(--ice); border-color:var(--muted); }
+
+.modal-title {
+  font-family:'Syne',sans-serif; font-weight:700;
+  font-size:1.25rem; color:var(--frost);
+  margin-bottom:.3rem; padding-right:2rem; line-height:1.3;
+}
+.modal-sub { font-size:.88rem; color:var(--muted); margin-bottom:1.5rem; }
+
+/* Form */
+.fg { margin-bottom:1rem; }
+.fg label {
+  display:block; font-family:'DM Mono',monospace;
+  font-size:.62rem; color:var(--muted); letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:.4rem;
+}
+.fg input {
+  width:100%; padding:.7rem .9rem;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border); border-radius:6px;
+  color:var(--text); font-family:'Barlow',sans-serif; font-size:.95rem;
+  outline:none; transition:border-color .2s;
+}
+.fg input:focus { border-color:var(--ice2); }
+.fg input::placeholder { color:var(--muted); }
+
+/* Promo */
+.promo-row { display:flex; gap:.5rem; }
+.promo-row input { flex:1; }
+.btn-promo {
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  padding:0 .9rem; background:rgba(255,255,255,.05);
+  border:1px solid var(--border); color:var(--muted);
+  border-radius:6px; cursor:pointer; white-space:nowrap;
+  transition:all .2s;
+}
+.btn-promo:hover { color:var(--ice); border-color:var(--muted); }
+.promo-fb { font-family:'DM Mono',monospace; font-size:.65rem; margin-top:.3rem; }
+.promo-ok  { color:var(--teal); }
+.promo-err { color:var(--danger); }
+
+/* Pay methods */
+.pay-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:1rem; }
+.pay-opt {
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border); border-radius:6px;
+  padding:.65rem .4rem;
+  display:flex; flex-direction:column; align-items:center; gap:.3rem;
+  cursor:pointer; transition:all .2s;
+  font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); text-align:center;
+}
+.pay-opt .pi { font-size:1.3rem; }
+.pay-opt.sel, .pay-opt:hover { border-color:var(--ice2); color:var(--ice); background:rgba(91,184,232,.06); }
+.pay-disabled { opacity:.25; pointer-events:none; cursor:not-allowed !important; }
+
+/* Demo banner */
+.demo-banner {
+  display:flex; align-items:center; gap:.75rem;
+  background:rgba(0,200,180,.06); border:1px solid rgba(0,200,180,.2);
+  border-radius:6px; padding:.7rem 1rem; margin-bottom:1.2rem;
+}
+.demo-banner strong { display:block; font-family:'DM Mono',monospace; font-size:.62rem; color:var(--teal); letter-spacing:1px; }
+.demo-banner span   { font-size:.85rem; color:var(--muted); }
+
+/* Total */
+.modal-total {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  margin-bottom:1rem;
+}
+.total-label { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); }
+.total-val   { font-family:'Syne',sans-serif; font-weight:700; font-size:1.2rem; color:var(--frost); }
+.total-val.disc { color:var(--teal); }
+
+/* Big button */
+.btn-main {
+  width:100%; padding:.85rem;
+  font-family:'DM Mono',monospace; font-size:.72rem;
+  background: linear-gradient(135deg, var(--ocean), var(--ice2));
+  color:#fff; border:none; border-radius:6px;
+  cursor:pointer; letter-spacing:.5px; text-transform:uppercase;
+  transition:all .25s;
+  box-shadow:0 0 20px rgba(91,184,232,.15), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.btn-main:hover { transform:translateY(-1px); box-shadow:0 6px 30px rgba(91,184,232,.3); }
+
+.btn-main.demo-mode {
+  background: linear-gradient(135deg, #0a3d2e, var(--teal2));
+  box-shadow:0 0 20px rgba(0,200,180,.1);
+}
+.btn-main.demo-mode:hover { box-shadow:0 6px 30px rgba(0,200,180,.25); }
+
+/* Auth tabs */
+.auth-tabs { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:1.5rem; }
+.auth-tab  { flex:1; padding:.5rem; background:transparent; border:none; cursor:pointer; font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; transition:all .2s; }
+.auth-tab.on { background:rgba(91,184,232,.1); color:var(--ice); }
+
+/* ── SUCCESS ── */
+#succ-overlay { z-index:600; }
+.succ-modal {
+  background:var(--card); border:1px solid rgba(0,200,180,.3);
+  border-radius:12px; padding:2.5rem;
+  max-width:420px; width:100%; text-align:center;
+  transform:scale(.9); transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 0 60px rgba(0,200,180,.08);
+}
+.overlay.open .succ-modal { transform:scale(1); }
+.succ-icon { font-size:3.5rem; display:block; margin-bottom:1.2rem; animation:pop .5s .2s both; }
+@keyframes pop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.succ-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; color:var(--teal); letter-spacing:-1px; margin-bottom:.4rem; }
+.succ-prod  { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--gold); letter-spacing:1px; margin-bottom:.8rem; }
+.succ-nick  { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:6px; padding:.5rem 1rem; display:inline-block; margin-bottom:1rem; font-family:'DM Mono',monospace; font-size:.85rem; }
+.succ-nick span { color:var(--teal); }
+.succ-desc  { color:var(--muted); font-size:.9rem; line-height:1.8; margin-bottom:1.5rem; }
+.prog-track { height:3px; background:var(--border); border-radius:99px; margin-bottom:.5rem; overflow:hidden; }
+.prog-fill  { height:100%; width:0%; background:linear-gradient(90deg, var(--teal2), var(--teal)); border-radius:99px; transition:width 3s linear; }
+.prog-fill.go { width:100%; }
+.succ-status { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:1px; margin-bottom:1.5rem; text-transform:uppercase; }
+.btn-sm { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); background:transparent; border:1px solid var(--border); border-radius:5px; padding:.4rem 1.2rem; cursor:pointer; transition:all .2s; }
+.btn-sm:hover { color:var(--ice); border-color:var(--muted); }
+
+/* ── ADMIN PANEL ── */
+#admin-overlay { z-index:700; align-items:flex-start; overflow-y:auto; }
+.admin-wrap {
+  background:var(--card); border:1px solid rgba(224,85,85,.3);
+  border-radius:12px; padding:2rem;
+  width:100%; max-width:960px; margin:2rem auto;
+  box-shadow:0 0 60px rgba(224,85,85,.05);
+}
+.admin-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+.admin-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; color:var(--danger); }
+.admin-tabs  { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.atab {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  padding:.4rem .9rem; cursor:pointer; border-radius:5px;
+  background:transparent; color:var(--muted);
+  border:1px solid var(--border); transition:all .2s;
+}
+.atab.on { background:rgba(224,85,85,.15); color:var(--danger); border-color:rgba(224,85,85,.4); }
+.atab:hover:not(.on) { color:var(--text); border-color:var(--muted); }
+
+.admin-sec { display:none; }
+.admin-sec.on { display:block; }
+
+.a-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+.a-card  {
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:8px; padding:1rem; text-align:center;
+}
+.a-card .n { font-family:'Syne',sans-serif; font-weight:800; font-size:1.8rem; color:var(--frost); display:block; }
+.a-card .l { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+/* Table */
+.tbl { width:100%; border-collapse:collapse; }
+.tbl th { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); text-align:left; padding:.5rem .6rem; border-bottom:1px solid var(--border); letter-spacing:1px; text-transform:uppercase; }
+.tbl td { font-size:.9rem; padding:.55rem .6rem; border-bottom:1px solid rgba(255,255,255,.03); color:var(--text); }
+.tbl tr:hover td { background:rgba(255,255,255,.015); }
+
+/* Promo add */
+.promo-add-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:stretch; }
+.promo-add-row input {
+  flex:1; min-width:100px; padding:.55rem .8rem;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:6px; color:var(--text); font-family:'Barlow',sans-serif; font-size:.9rem;
+  outline:none;
+}
+.promo-add-row input:focus { border-color:var(--teal); }
+.btn-add {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  padding:.5rem .9rem; background:rgba(0,200,180,.12);
+  color:var(--teal); border:1px solid rgba(0,200,180,.3);
+  border-radius:6px; cursor:pointer; white-space:nowrap; transition:all .2s;
+}
+.btn-add:hover { background:rgba(0,200,180,.22); }
+.btn-del {
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  padding:.28rem .6rem; background:rgba(224,85,85,.1);
+  color:var(--danger); border:1px solid rgba(224,85,85,.3);
+  border-radius:4px; cursor:pointer; transition:all .2s;
+}
+.btn-del:hover { background:rgba(224,85,85,.22); }
+
+/* Key prompt */
+.key-box {
+  background:var(--card); border:1px solid rgba(224,85,85,.3);
+  border-radius:12px; padding:2rem;
+  max-width:370px; width:100%; text-align:center;
+  box-shadow:0 0 40px rgba(224,85,85,.07);
+}
+
+/* ── CONFIRM ── */
+#confirm-overlay { z-index:800; }
+.confirm-box {
+  background:var(--card); border:1px solid rgba(224,85,85,.3);
+  border-radius:10px; padding:2rem;
+  max-width:360px; width:100%; text-align:center;
+}
+.confirm-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; color:var(--danger); margin-bottom:.6rem; }
+.confirm-desc  { font-size:.9rem; color:var(--muted); margin-bottom:1.5rem; line-height:1.7; }
+.confirm-btns  { display:flex; gap:.7rem; justify-content:center; }
+.btn-danger {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  padding:.45rem 1rem; background:rgba(224,85,85,.15);
+  color:var(--danger); border:1px solid rgba(224,85,85,.4);
+  border-radius:5px; cursor:pointer; transition:all .2s;
+}
+.btn-danger:hover { background:rgba(224,85,85,.3); }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:8px; padding:.8rem 1.2rem;
+  max-width:280px; transform:translateX(160%); transition:transform .3s;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+#toast.show { transform:translateX(0); }
+#toast-t { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--teal); margin-bottom:.25rem; letter-spacing:.5px; }
+#toast-m { font-size:.88rem; color:var(--muted); }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.fa1 { animation:fadeUp .6s ease both; }
+.fa2 { animation:fadeUp .6s .15s ease both; }
+.fa3 { animation:fadeUp .6s .3s ease both; }
+.fa4 { animation:fadeUp .6s .45s ease both; }
+
+/* Responsive */
+@media(max-width:700px) {
+  header { padding:0 1rem; }
+  nav { display:none; }
+  .hero h1 { letter-spacing:-1px; }
+  .admin-wrap { padding:1rem; margin:.5rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ──────────── HEADER ──────────── -->
+<header>
+  <div class="logo"><div class="logo-dot"></div>FrostMC</div>
+  <nav>
+    <a href="#sklep">Sklep</a>
+    <a href="#how">Jak działa</a>
+  </nav>
+  <div class="nav-actions">
+    <!-- Admin dostepny przez Ctrl+Shift+A -->
+    <button class="btn-ghost" id="btn-login" onclick="openAuth('login')">Zaloguj</button>
+    <button class="btn-solid" id="btn-reg"   onclick="openAuth('reg')">Rejestracja</button>
+    <span id="nav-user"></span>
+    <button class="btn-ghost" id="btn-logout" style="display:none" onclick="doLogout()">Wyloguj</button>
+  </div>
+</header>
+
+<!-- ──────────── HERO ──────────── -->
+<section class="hero">
+  <div class="hero-eyebrow fa1">⛏ FrostMC Network</div>
+  <h1 class="fa2">Twoja ranga.<br><em>Twoje zasady.</em></h1>
+  <p class="hero-sub fa3">Kupuj rangi, klucze i przywileje. Dostawą na serwer — automatycznie, w kilka sekund po zakupie.</p>
+  <div class="hero-cta fa4">
+    <a href="#sklep" class="cta-primary">Przeglądaj sklep</a>
+    <a href="#how"   class="cta-sec">Jak to działa?</a>
+  </div>
+  <div class="hero-stats fa4">
+    <div class="stat-item">
+      <span class="stat-num" data-target="2847">0</span>
+      <span class="stat-label">Graczy ogółem</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="1284">0</span>
+      <span class="stat-label">Zakupów</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="99">0</span>
+      <span class="stat-label">% Zadowolonych</span>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── SKLEP ──────────── -->
+<section id="sklep">
+  <div class="sec-header">
+    <span class="sec-tag">Sklep</span>
+    <h2 class="sec-title">Wybierz pakiet</h2>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on"  onclick="switchTab('rangi',this)">Rangi</button>
+    <button class="tab"     onclick="switchTab('klucze',this)">Klucze</button>
+  </div>
+
+  <!-- RANGI -->
+  <div id="t-rangi" class="shop-section on">
+    <div class="shop-grid">
+
+      <div class="pcard r-vip" onclick="openBuy('VIP','29.99','vip')">
+        <span class="pcard-icon">🌿</span>
+        <div class="pcard-cat">Ranga</div>
+        <div class="pcard-name">VIP</div>
+        <ul class="perk-list">
+          <li>Prefix §a[VIP]§r na czacie</li>
+          <li>/fly w lobby</li>
+          <li>2× mnożnik XP</li>
+          <li>Prywatna kopalnia</li>
+          <li>Dostęp do VIP /kit</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">49.99 PLN</span><span class="price-now">29.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-svip" onclick="openBuy('S-VIP','59.99','svip')">
+        <span class="badge b-hot">🔥 Popular</span>
+        <span class="pcard-icon">💎</span>
+        <div class="pcard-cat">Ranga</div>
+        <div class="pcard-name">S-VIP</div>
+        <ul class="perk-list">
+          <li>Wszystko z VIP</li>
+          <li>/fly wszędzie</li>
+          <li>3× mnożnik XP</li>
+          <li>5× /sethome</li>
+          <li>Nick color pick</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">89.99 PLN</span><span class="price-now">59.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-mvp" onclick="openBuy('MVP','99.99','mvp')">
+        <span class="pcard-icon">⭐</span>
+        <div class="pcard-cat">Ranga</div>
+        <div class="pcard-name">MVP</div>
+        <ul class="perk-list">
+          <li>Wszystko z S-VIP</li>
+          <li>Złoty prefix §6[MVP]§r</li>
+          <li>5× mnożnik XP</li>
+          <li>VIP arena PvP</li>
+          <li>Klucze co tydzień</li>
+          <li>Priorytet wejścia</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">149.99 PLN</span><span class="price-now">99.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-mvpp" onclick="openBuy('MVP+','149.99','mvpp')">
+        <span class="badge b-new">✨ Nowe</span>
+        <span class="pcard-icon">👑</span>
+        <div class="pcard-cat">Ranga</div>
+        <div class="pcard-name">MVP+</div>
+        <ul class="perk-list">
+          <li>Wszystko z MVP</li>
+          <li>Fioletowy prefix §5[MVP+]§r</li>
+          <li>Własna kita co 24h</li>
+          <li>Particle effects</li>
+          <li>∞ sethome</li>
+          <li>End-of-season access</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">199.99 PLN</span><span class="price-now">149.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- KLUCZE -->
+  <div id="t-klucze" class="shop-section">
+    <div class="shop-grid">
+
+      <div class="pcard r-key" onclick="openBuy('Klucz Żelazny x1','4.99','klucz1')">
+        <span class="pcard-icon">🗝️</span>
+        <div class="pcard-cat">Klucz · Common</div>
+        <div class="pcard-name">Żelazny ×1</div>
+        <ul class="perk-list">
+          <li>1 klucz do skrzynki</li>
+          <li>Szansa na rare item</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-now">4.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-key" onclick="openBuy('Klucz Żelazny x3','12.99','klucz3')">
+        <span class="badge b-sale">−13%</span>
+        <span class="pcard-icon">🔑</span>
+        <div class="pcard-cat">Klucz · Common ×3</div>
+        <div class="pcard-name">Żelazny ×3</div>
+        <ul class="perk-list">
+          <li>3 klucze do skrzynek</li>
+          <li>Wyższa szansa na epic</li>
+          <li>Bonus: 500 monet</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">14.97 PLN</span><span class="price-now">12.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-keygold" onclick="openBuy('Klucz Złoty x5','19.99','klucz5')">
+        <span class="badge b-hot">⭐ Best</span>
+        <span class="pcard-icon">✨</span>
+        <div class="pcard-cat">Klucz · Golden ×5</div>
+        <div class="pcard-name">Złoty ×5</div>
+        <ul class="perk-list">
+          <li>5 kluczy premium</li>
+          <li>Guaranteed rare drop</li>
+          <li>Bonus: 1500 monet</li>
+          <li>Szansa na rangę VIP</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">24.95 PLN</span><span class="price-now">19.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+      <div class="pcard r-keydiam" onclick="openBuy('Klucz Diamentowy x10','34.99','klucz10')">
+        <span class="badge b-new">💎 VIP</span>
+        <span class="pcard-icon">💎</span>
+        <div class="pcard-cat">Klucz · Diamond ×10</div>
+        <div class="pcard-name">Diamentowy ×10</div>
+        <ul class="perk-list">
+          <li>10 kluczy diamentowych</li>
+          <li>2× guaranteed epic</li>
+          <li>Bonus: 5000 monet</li>
+          <li>Szansa na S-VIP</li>
+          <li>Exclusive cosmetic</li>
+        </ul>
+        <div class="pcard-foot">
+          <div><span class="price-old">49.90 PLN</span><span class="price-now">34.99 PLN</span></div>
+          <button class="btn-buy">Kup</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── HOW IT WORKS ──────────── -->
+<section id="how">
+  <div class="sec-header">
+    <span class="sec-tag">Instrukcja</span>
+    <h2 class="sec-title">Jak to działa?</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <span class="step-n">01</span>
+      <h3>Wybierz produkt</h3>
+      <p>Przeglądaj rangi i klucze. Kliknij "Kup" przy wybranym pakiecie.</p>
+    </div>
+    <div class="step">
+      <span class="step-n">02</span>
+      <h3>Wpisz nick & email</h3>
+      <p>Nick musi być identyczny jak na serwerze. Email dostanie potwierdzenie zakupu.</p>
+    </div>
+    <div class="step">
+      <span class="step-n">03</span>
+      <h3>Kod promo (opcja)</h3>
+      <p>Masz kod rabatowy? Wpisz go w formularzu i natychmiast zobaczysz nową cenę.</p>
+    </div>
+    <div class="step">
+      <span class="step-n">04</span>
+      <h3>Instant delivery</h3>
+      <p>Plugin na serwerze odbiera zakup i automatycznie nadaje rangę przez LuckPerms.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── FOOTER ──────────── -->
+<footer>
+  <div class="footer-logo">FrostMC</div>
+  <p>© 2025 FrostMC · Nie powiązany z Mojang Studios</p>
+  <button onclick="openAdmin()" style="
+    background:transparent; border:1px solid rgba(224,85,85,.25);
+    color:rgba(224,85,85,.5); padding:.3rem .8rem; border-radius:4px;
+    font-family:'DM Mono',monospace; font-size:.6rem; cursor:pointer;
+    letter-spacing:1px; text-transform:uppercase; transition:all .3s;
+  " onmouseover="this.style.borderColor='rgba(224,85,85,.6)';this.style.color='rgba(224,85,85,.9)'"
+     onmouseout="this.style.borderColor='rgba(224,85,85,.25)';this.style.color='rgba(224,85,85,.5)'">
+    ⚙ panel właściciela
+  </button>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════ -->
+
+<!-- BUY -->
+<div class="overlay" id="buy-ov">
+  <div class="modal">
+    <button class="modal-x" onclick="closeO('buy-ov')">✕</button>
+    <div class="modal-title" id="buy-title">Zakup</div>
+    <div class="modal-sub"   id="buy-sub">Wypełnij formularz</div>
+
+    <div class="demo-banner">
+      <span style="font-size:1.5rem">🧪</span>
+      <div>
+        <strong>TRYB DEMO — Płatności wyłączone</strong>
+        <span>Zakup zostanie aktywowany automatycznie na serwerze</span>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Nick Minecraft *</label>
+      <input type="text" id="b-nick" placeholder="dokładnie jak na serwerze…" maxlength="16">
+    </div>
+    <div class="fg">
+      <label>Email * — dostaniesz potwierdzenie</label>
+      <input type="email" id="b-email" placeholder="twoj@email.com">
+    </div>
+
+    <div class="fg">
+      <label>Kod promocyjny</label>
+      <div class="promo-row">
+        <input type="text" id="promo-in" placeholder="np. FROST20" style="text-transform:uppercase">
+        <button class="btn-promo" onclick="applyPromo()">Zastosuj</button>
+      </div>
+      <div class="promo-fb" id="promo-fb"></div>
+    </div>
+
+    <div class="fg">
+      <label>Metoda płatności — wkrótce</label>
+      <div class="pay-grid">
+        <div class="pay-opt pay-disabled"><span class="pi">🅿️</span>PayPal</div>
+        <div class="pay-opt pay-disabled"><span class="pi">🏦</span>BLIK</div>
+        <div class="pay-opt pay-disabled"><span class="pi">📱</span>SMS</div>
+      </div>
+    </div>
+
+    <div class="modal-total">
+      <span class="total-label">Do zapłaty</span>
+      <span class="total-val" id="buy-total">0.00 PLN</span>
+    </div>
+
+    <button class="btn-main demo-mode" onclick="handleBuy()">🧪 Aktywuj demo</button>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="overlay" id="succ-overlay">
+  <div class="succ-modal">
+    <span class="succ-icon">🎉</span>
+    <div class="succ-title">Zakup udany!</div>
+    <div class="succ-prod" id="s-prod"></div>
+    <div class="succ-nick">Nick: <span id="s-nick">—</span></div>
+    <div class="succ-desc">Ranga zostanie nadana przez plugin w ciągu kilku sekund.<br>Potwierdzenie leci na Twój email 📧</div>
+    <div class="prog-track"><div class="prog-fill" id="s-bar"></div></div>
+    <div class="succ-status" id="s-status">Łączenie z serwerem…</div>
+    <button class="btn-sm" onclick="closeO('succ-overlay')">Zamknij</button>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="overlay" id="auth-ov">
+  <div class="modal">
+    <button class="modal-x" onclick="closeO('auth-ov')">✕</button>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="at-login" onclick="switchAuth('login')">Zaloguj się</button>
+      <button class="auth-tab"    id="at-reg"   onclick="switchAuth('reg')">Rejestracja</button>
+    </div>
+
+    <div id="f-login">
+      <div class="modal-title">Logowanie</div>
+      <div class="modal-sub">Nick Minecraft + hasło</div>
+      <div class="fg"><label>Nick Minecraft</label><input id="l-nick" type="text" placeholder="Twój nick…"></div>
+      <div class="fg"><label>Hasło</label><input id="l-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-main" style="margin-top:.5rem" onclick="doLogin()">Zaloguj się</button>
+    </div>
+
+    <div id="f-reg" style="display:none">
+      <div class="modal-title">Rejestracja</div>
+      <div class="modal-sub">Utwórz konto serwerowe</div>
+      <div id="owner-hint" style="display:none;background:rgba(0,200,180,.08);border:1px solid rgba(0,200,180,.25);border-radius:6px;padding:.6rem .9rem;margin-bottom:1rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--teal);letter-spacing:.5px">
+        ✓ EMAIL WŁAŚCICIELA — po rejestracji zobaczysz przycisk ADMIN
+      </div>
+      <div class="fg"><label>Nick Minecraft *</label><input id="r-nick" type="text" placeholder="3–16 znaków" maxlength="16"></div>
+      <div class="fg"><label>Email *</label><input id="r-email" type="email" placeholder="twoj@email.com"></div>
+      <div class="fg"><label>Hasło * (min 6 znaków)</label><input id="r-pass" type="password" placeholder="••••••"></div>
+      <div class="fg"><label>Potwierdź hasło *</label><input id="r-pass2" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doReg()"></div>
+      <button class="btn-main" style="margin-top:.5rem" onclick="doReg()">Zarejestruj się</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="overlay" id="admin-ov">
+
+  <!-- KEY PROMPT -->
+  <div class="key-box" id="key-box">
+    <div class="modal-title" style="color:var(--danger);text-align:center;margin-bottom:.5rem">Panel właściciela</div>
+    <div class="modal-sub" style="text-align:center;margin-bottom:1.2rem">Wpisz tajny klucz dostępu</div>
+    <div class="fg"><input type="password" id="admin-key" placeholder="Tajny klucz…" onkeydown="if(event.key==='Enter')verifyKey()"></div>
+    <button class="btn-main" style="background:linear-gradient(135deg,#5a0a0a,var(--danger))" onclick="verifyKey()">Wejdź</button>
+    <div style="text-align:center;margin-top:.8rem">
+      <button class="btn-sm" onclick="closeO('admin-ov')">Anuluj</button>
+    </div>
+  </div>
+
+  <!-- PANEL CONTENT -->
+  <div class="admin-wrap" id="adm-content" style="display:none">
+    <div class="admin-hdr">
+      <div class="admin-title">Panel właściciela — <span style="font-size:.9rem;color:var(--teal)">ciachowtf3@op.pl</span></div>
+      <button class="btn-sm" onclick="closeO('admin-ov')">Zamknij</button>
+    </div>
+
+    <div class="a-stats">
+      <div class="a-card"><span class="n" id="a-u">0</span><div class="l">Użytkownicy</div></div>
+      <div class="a-card"><span class="n" id="a-b">0</span><div class="l">Zakupy (demo)</div></div>
+      <div class="a-card"><span class="n" id="a-p">0</span><div class="l">Kody promo</div></div>
+      <div class="a-card"><span class="n" id="a-s" style="color:var(--muted);font-size:1rem">—</span><div class="l">Status serwera</div></div>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="atab on" onclick="switchAdmTab('users',this)">Użytkownicy</button>
+      <button class="atab"    onclick="switchAdmTab('buys',this)">Zakupy</button>
+      <button class="atab"    onclick="switchAdmTab('promos',this)">Kody promo</button>
+      <button class="atab"    onclick="switchAdmTab('server',this)">Serwer</button>
+    </div>
+
+    <!-- USERS -->
+    <div class="admin-sec on" id="as-users">
+      <table class="tbl"><thead><tr><th>Nick</th><th>Email</th><th>Data rej.</th><th>Zakupy</th><th>Akcja</th></tr></thead>
+      <tbody id="tb-users"></tbody></table>
+    </div>
+
+    <!-- BUYS -->
+    <div class="admin-sec" id="as-buys">
+      <table class="tbl"><thead><tr><th>Nick</th><th>Produkt</th><th>Cena</th><th>Kod promo</th><th>Data</th></tr></thead>
+      <tbody id="tb-buys"></tbody></table>
+    </div>
+
+    <!-- PROMOS -->
+    <div class="admin-sec" id="as-promos">
+      <div class="promo-add-row" style="margin-bottom:1rem">
+        <input type="text"   id="pc-code" placeholder="KOD PROMO" style="text-transform:uppercase">
+        <input type="number" id="pc-disc" placeholder="% zniżki"  min="1" max="99">
+        <input type="number" id="pc-uses" placeholder="Limit użyć (0=∞)" min="0">
+        <button class="btn-add" onclick="addPromo()">+ Dodaj</button>
+      </div>
+      <table class="tbl"><thead><tr><th>Kod</th><th>Zniżka</th><th>Max użyć</th><th>Zostało</th><th></th></tr></thead>
+      <tbody id="tb-promos"></tbody></table>
+    </div>
+
+    <!-- SERVER -->
+    <div class="admin-sec" id="as-server">
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:1.5rem">
+        <div id="srv-status-line" style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--muted);line-height:2.5">
+          Ładowanie danych serwera…
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn-add" onclick="checkServer()">↺ Odśwież status</button>
+        </div>
+        <div style="margin-top:1rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted)">
+          Status jest pobierany z backendu. Skonfiguruj <code>server.js</code> żeby widzieć prawdziwe dane.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="overlay" id="confirm-ov">
+  <div class="confirm-box">
+    <div class="confirm-title">Potwierdzenie</div>
+    <div class="confirm-desc" id="confirm-desc">Czy na pewno?</div>
+    <div class="confirm-btns">
+      <button class="btn-danger" id="confirm-ok">Tak, usuń</button>
+      <button class="btn-sm"     onclick="closeO('confirm-ov')">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div id="toast-t"></div><div id="toast-m"></div></div>
+
+<!-- ═══════════════════════════════════════════
+     JS
+═══════════════════════════════════════════ -->
+<script>
+/* ── CONFIG ── */
+const OWNER_EMAIL  = 'ciachowtf3@op.pl';
+const ADMIN_SECRET = 'FROSTMC2025'; // ← zmień na coś swojego!
+const BACKEND_URL  = 'http://localhost:3000'; // ← adres twojego backendu
+
+/* ── DB (localStorage demo) ── */
+const DB = {
+  g:(k)=>{ try{return JSON.parse(localStorage.getItem('fm_'+k)||'null')}catch{return null} },
+  s:(k,v)=>localStorage.setItem('fm_'+k,JSON.stringify(v)),
+  get users(){return this.g('users')||[]},   set users(v){this.s('users',v)},
+  get buys() {return this.g('buys') ||[]},   set buys(v) {this.s('buys',v)},
+  get promos(){
+    return this.g('promos')||[
+      {code:'FROST20', discount:20, maxUses:0, used:0},
+      {code:'ICE50',   discount:50, maxUses:5, used:0},
+      {code:'DEMO100', discount:100,maxUses:3, used:0},
+    ];
+  },
+  set promos(v){this.s('promos',v)},
+};
+if(!DB.g('promos')) DB.promos=DB.promos;
+
+// Sesja działa przez localStorage - przezywa odswiezenie strony
+function _loadSess(){ try{ const r=localStorage.getItem('fm_session'); return r?JSON.parse(r):null; }catch{return null;} }
+function _saveSess(u){ localStorage.setItem('fm_session', JSON.stringify(u)); }
+function _clearSess(){ localStorage.removeItem('fm_session'); }
+
+let session  = _loadSess();
+let curBuy   = {name:'',price:0,id:''};
+let curPromo = null;
+
+/* ── INIT ── */
+window.addEventListener('load', ()=>{
+  // Synchronizuj sesje z baza uzytkownikow (jesli konto usunieto)
+  if(session){
+    const found = DB.users.find(u=>u.nick===session.nick && u.pass===session.pass);
+    if(!found){ _clearSess(); session=null; }
+    else { session=found; _saveSess(found); } // odswież dane sesji
+  }
+  refreshNav(); animCounters();
+});
+
+function refreshNav(){
+  const S = session;
+  const el = id => document.getElementById(id);
+  const show = (id,v) => { const e=el(id); if(e) e.style.display=v?'':'none'; };
+  const flex = (id,v) => { const e=el(id); if(e) e.style.display=v?'flex':'none'; };
+
+  flex('nav-user', !!S);
+  show('btn-login',  !S);
+  show('btn-reg',    !S);
+  show('btn-logout', !!S);
+  if(S && el('nav-user')) el('nav-user').textContent = '👤 '+S.nick;
+
+  // Admin przez Ctrl+Shift+A
+}
+
+/* ── OVERLAY ── */
+function openO(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeO(id){
+  document.getElementById(id).classList.remove('open');
+  if(!document.querySelector('.overlay.open')) document.body.style.overflow='';
+}
+document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) closeO(el.id); }));
+
+/* ── SHOP TABS ── */
+function switchTab(tab,btn){
+  document.querySelectorAll('.shop-section').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
+  document.getElementById('t-'+tab).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ── BUY MODAL ── */
+function openBuy(name,price,id){
+  curBuy={name,price:parseFloat(price),id};
+  curPromo=null;
+  document.getElementById('buy-title').textContent='Zakup: '+name;
+  document.getElementById('buy-sub').textContent='Cena: '+price+' PLN';
+  document.getElementById('b-nick').value  = session?session.nick:'';
+  document.getElementById('b-email').value = session?session.email:'';
+  document.getElementById('promo-in').value='';
+  document.getElementById('promo-fb').textContent='';
+  document.getElementById('promo-fb').className='promo-fb';
+  refreshTotal();
+  openO('buy-ov');
+}
+function refreshTotal(){
+  const el=document.getElementById('buy-total');
+  let p=curBuy.price;
+  if(curPromo){ p=p*(1-curPromo.discount/100); el.className='total-val disc'; }
+  else { el.className='total-val'; }
+  el.textContent=p.toFixed(2)+' PLN  (DEMO — gratis)';
+}
+
+/* ── PROMO ── */
+function applyPromo(){
+  const code=document.getElementById('promo-in').value.trim().toUpperCase();
+  const fb=document.getElementById('promo-fb');
+  if(!code) return;
+  const p=DB.promos.find(x=>x.code===code);
+  if(!p){ fb.textContent='✕ Kod nie istnieje'; fb.className='promo-fb promo-err'; curPromo=null; refreshTotal(); return; }
+  if(p.maxUses>0&&p.used>=p.maxUses){ fb.textContent='✕ Kod wyczerpany'; fb.className='promo-fb promo-err'; curPromo=null; refreshTotal(); return; }
+  curPromo=p;
+  fb.textContent='✓ −'+p.discount+'% zastosowane!'; fb.className='promo-fb promo-ok';
+  refreshTotal();
+}
+
+/* ── HANDLE BUY ── */
+async function handleBuy(){
+  const nick =document.getElementById('b-nick').value.trim();
+  const email=document.getElementById('b-email').value.trim();
+  if(!nick)                   { toast('Błąd','Podaj nick Minecraft!',true); return; }
+  if(!email||!email.includes('@')){ toast('Błąd','Podaj poprawny email!',true); return; }
+
+  /* użyj kodu promo */
+  if(curPromo){
+    const promos=DB.promos;
+    const i=promos.findIndex(x=>x.code===curPromo.code);
+    if(i>-1){ promos[i].used++; DB.promos=promos; }
+  }
+  const finalPrice=curPromo?(curBuy.price*(1-curPromo.discount/100)).toFixed(2):curBuy.price.toFixed(2);
+
+  /* Zapis lokalny */
+  const entry={nick,email,product:curBuy.name,productId:curBuy.id,price:finalPrice,promo:curPromo?curPromo.code:'—',date:new Date().toLocaleString('pl-PL')};
+  const buys=DB.buys; buys.unshift(entry); DB.buys=buys;
+  const users=DB.users; const ui=users.findIndex(u=>u.nick.toLowerCase()===nick.toLowerCase());
+  if(ui>-1){ users[ui].purchases=(users[ui].purchases||0)+1; DB.users=users; }
+
+  /* ── Wyślij do backendu (plugin dostanie komendę) ── */
+  try {
+    await fetch(BACKEND_URL+'/api/purchase', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nick, email, productId:curBuy.id, product:curBuy.name, price:finalPrice, promo:curPromo?curPromo.code:null})
+    });
+  } catch(e) {
+    /* Backend niedostępny w trybie demo — OK */
+  }
+
+  closeO('buy-ov');
+  showSuccess(nick, curBuy.name);
+}
+
+function showSuccess(nick,product){
+  document.getElementById('s-nick').textContent=nick;
+  document.getElementById('s-prod').textContent=product;
+  document.getElementById('s-status').textContent='Łączenie z serwerem…';
+  document.getElementById('s-bar').classList.remove('go');
+  openO('succ-overlay');
+  setTimeout(()=>document.getElementById('s-bar').classList.add('go'),80);
+  [[800,'Połączono z pluginem…'],[1700,'Weryfikacja zakupu…'],[2500,'Nadawanie rangi przez LuckPerms…'],[3200,'✓ Gotowe! Zaloguj się na serwer!']].forEach(
+    ([d,t])=>setTimeout(()=>document.getElementById('s-status').textContent=t, d)
+  );
+}
+
+/* ── AUTH ── */
+function openAuth(tab){ openO('auth-ov'); switchAuth(tab); }
+
+// Pokaz hint wlasciciela jezeli wpisuje swoj email
+document.addEventListener('DOMContentLoaded', ()=>{
+  const regEmail = document.getElementById('r-email');
+  if(regEmail){
+    regEmail.addEventListener('input', ()=>{
+      const hint = document.getElementById('owner-hint');
+      if(hint) hint.style.display = regEmail.value.trim().toLowerCase()===OWNER_EMAIL.toLowerCase() ? 'block':'none';
+    });
+  }
+});
+function switchAuth(tab){
+  document.getElementById('f-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('f-reg').style.display=tab==='reg'?'block':'none';
+  document.getElementById('at-login').className='auth-tab'+(tab==='login'?' on':'');
+  document.getElementById('at-reg').className='auth-tab'+(tab==='reg'?' on':'');
+}
+
+function doLogin(){
+  const nick=document.getElementById('l-nick').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  if(!nick||!pass){ toast('Błąd','Wypełnij wszystkie pola!',true); return; }
+  const user=DB.users.find(u=>u.nick.toLowerCase()===nick.toLowerCase()&&u.pass===hp(pass));
+  if(!user){ toast('Błąd','Zły nick lub hasło!',true); return; }
+  session=user; _saveSess(user);
+  closeO('auth-ov'); refreshNav();
+  toast('Zalogowano','Witaj, '+user.nick+'!');
+}
+
+function doReg(){
+  const nick=document.getElementById('r-nick').value.trim();
+  const email=document.getElementById('r-email').value.trim().toLowerCase();
+  const pass=document.getElementById('r-pass').value;
+  const pass2=document.getElementById('r-pass2').value;
+  if(!nick||!email||!pass){ toast('Błąd','Wypełnij wszystkie pola!',true); return; }
+  if(pass!==pass2){ toast('Błąd','Hasła nie są zgodne!',true); return; }
+  if(pass.length<6){ toast('Błąd','Hasło min. 6 znaków!',true); return; }
+  if(!email.includes('@')){ toast('Błąd','Podaj poprawny email!',true); return; }
+  if(!/^[a-zA-Z0-9_]{3,16}$/.test(nick)){ toast('Błąd','Nick: 3–16 znaków (litery, cyfry, _)',true); return; }
+  const users=DB.users;
+  if(users.find(u=>u.nick.toLowerCase()===nick.toLowerCase())){ toast('Błąd','Nick zajęty!',true); return; }
+  // WAZNE: email zapisany lowercase - porownanie z OWNER_EMAIL dziala zawsze
+  const u={nick, email, pass:hp(pass), joinDate:new Date().toLocaleDateString('pl-PL'), purchases:0};
+  users.push(u); DB.users=users;
+  session=u; _saveSess(u);
+  closeO('auth-ov'); refreshNav();
+  // Sprawdz czy to wlasciciel
+  if(email===OWNER_EMAIL.toLowerCase()){
+    toast('Witamy Właścicielu!','Panel Admin dostępny w menu ✓');
+  } else {
+    toast('Witamy!','Konto '+nick+' zostało utworzone!');
+  }
+}
+
+function doLogout(){
+  session=null; _clearSess();
+  refreshNav(); toast('Wylogowano','Do zobaczenia!');
+}
+function hp(s){ let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;} return 'h'+Math.abs(h).toString(36); }
+
+/* ── ADMIN ── */
+function openAdmin(){
+  // Bez sprawdzania emaila - tylko tajny klucz
+  document.getElementById('key-box').style.display='block';
+  document.getElementById('adm-content').style.display='none';
+  document.getElementById('admin-key').value='';
+  openO('admin-ov');
+}
+function verifyKey(){
+  if(document.getElementById('admin-key').value.trim()!==ADMIN_SECRET){ toast('Błąd','Zły klucz!',true); return; }
+  document.getElementById('key-box').style.display='none';
+  document.getElementById('adm-content').style.display='block';
+  loadAdminData();
+}
+function loadAdminData(){
+  const u=DB.users,b=DB.buys,p=DB.promos;
+  document.getElementById('a-u').textContent=u.length;
+  document.getElementById('a-b').textContent=b.length;
+  document.getElementById('a-p').textContent=p.length;
+
+  document.getElementById('tb-users').innerHTML=u.length===0
+    ?'<tr><td colspan="5" style="color:var(--muted)">Brak użytkowników</td></tr>'
+    :u.map((x,i)=>`<tr>
+      <td style="color:var(--frost);font-weight:600">${x.nick}</td>
+      <td style="color:var(--muted)">${x.email}</td>
+      <td style="color:var(--muted)">${x.joinDate}</td>
+      <td>${x.purchases||0}</td>
+      <td><button class="btn-del" onclick="confirmReset(${i},'${x.nick}')">Resetuj konto</button></td>
+    </tr>`).join('');
+
+  document.getElementById('tb-buys').innerHTML=b.length===0
+    ?'<tr><td colspan="5" style="color:var(--muted)">Brak zakupów</td></tr>'
+    :b.map(x=>`<tr>
+      <td style="color:var(--frost);font-weight:600">${x.nick}</td>
+      <td>${x.product}</td>
+      <td style="color:var(--teal)">${x.price} PLN</td>
+      <td style="color:var(--muted)">${x.promo}</td>
+      <td style="color:var(--muted);font-size:.82rem">${x.date}</td>
+    </tr>`).join('');
+
+  renderPromos();
+  checkServer();
+}
+function renderPromos(){
+  const p=DB.promos;
+  document.getElementById('a-p').textContent=p.length;
+  document.getElementById('tb-promos').innerHTML=p.length===0
+    ?'<tr><td colspan="5" style="color:var(--muted)">Brak kodów</td></tr>'
+    :p.map((x,i)=>`<tr>
+      <td style="color:var(--gold);font-family:\'DM Mono\',monospace">${x.code}</td>
+      <td style="color:var(--teal)">−${x.discount}%</td>
+      <td>${x.maxUses===0?'∞':x.maxUses}</td>
+      <td>${x.maxUses===0?'∞':(x.maxUses-x.used)}</td>
+      <td><button class="btn-del" onclick="confirmDelPromo(${i},'${x.code}')">Usuń</button></td>
+    </tr>`).join('');
+}
+function addPromo(){
+  const code=document.getElementById('pc-code').value.trim().toUpperCase();
+  const disc=parseInt(document.getElementById('pc-disc').value);
+  const uses=parseInt(document.getElementById('pc-uses').value)||0;
+  if(!code){ toast('Błąd','Wpisz kod!',true); return; }
+  if(!disc||disc<1||disc>99){ toast('Błąd','Zniżka 1–99%!',true); return; }
+  const promos=DB.promos;
+  if(promos.find(p=>p.code===code)){ toast('Błąd','Kod już istnieje!',true); return; }
+  promos.push({code,discount:disc,maxUses:uses,used:0}); DB.promos=promos;
+  document.getElementById('pc-code').value='';
+  document.getElementById('pc-disc').value='';
+  document.getElementById('pc-uses').value='';
+  renderPromos(); toast('Dodano','Kod '+code+' (−'+disc+'%) dodany!');
+}
+function confirmDelPromo(i,code){
+  document.getElementById('confirm-desc').innerHTML='Usunąć kod <b style="color:var(--gold)">'+code+'</b>?';
+  document.getElementById('confirm-ok').onclick=()=>{
+    const p=DB.promos; p.splice(i,1); DB.promos=p;
+    renderPromos(); closeO('confirm-ov'); toast('Usunięto','Kod '+code+' usunięty.');
+  };
+  openO('confirm-ov');
+}
+function confirmReset(i,nick){
+  document.getElementById('confirm-desc').innerHTML='Usunąć konto gracza <b style="color:var(--frost)">'+nick+'</b>?<br><small>Usuwa też historię zakupów.</small>';
+  document.getElementById('confirm-ok').onclick=()=>{
+    const users=DB.users; users.splice(i,1); DB.users=users;
+    DB.buys=DB.buys.filter(b=>b.nick.toLowerCase()!==nick.toLowerCase());
+    if(session&&session.nick.toLowerCase()===nick.toLowerCase()){ session=null; _clearSess(); refreshNav(); }
+    closeO('confirm-ov'); loadAdminData(); toast('Reset','Konto '+nick+' usunięte.');
+  };
+  openO('confirm-ov');
+}
+function switchAdmTab(tab,btn){
+  document.querySelectorAll('.admin-sec').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.atab').forEach(e=>e.classList.remove('on'));
+  document.getElementById('as-'+tab).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ── SERVER STATUS (pyta backend) ── */
+async function checkServer(){
+  const el=document.getElementById('srv-status-line');
+  const aEl=document.getElementById('a-s');
+  try {
+    const r=await fetch(BACKEND_URL+'/api/server-status',{signal:AbortSignal.timeout(4000)});
+    const d=await r.json();
+    aEl.textContent=d.online?'ONLINE':'OFFLINE';
+    aEl.style.color=d.online?'var(--teal)':'var(--danger)';
+    el.innerHTML=`
+      Status: <span style="color:${d.online?'var(--teal)':'var(--danger)'}">${d.online?'● ONLINE':'○ OFFLINE'}</span><br>
+      Gracze: <span style="color:var(--frost)">${d.players||0} / ${d.maxPlayers||0}</span><br>
+      MOTD: <span style="color:var(--muted)">${d.motd||'—'}</span><br>
+      Wersja: <span style="color:var(--muted)">${d.version||'—'}</span>
+    `;
+  } catch {
+    aEl.textContent='—'; aEl.style.color='var(--muted)';
+    el.innerHTML='<span style="color:var(--muted)">Backend niedostępny. Uruchom server.js żeby zobaczyć status serwera.</span>';
+  }
+}
+
+/* ── TOAST ── */
+function toast(title,msg,err=false){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-t').textContent=title;
+  document.getElementById('toast-m').textContent=msg;
+  t.style.borderColor=err?'rgba(224,85,85,.4)':'rgba(91,184,232,.3)';
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+/* ── COUNTERS ── */
+function animCounters(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('[data-target]').forEach(el=>{
+          const tgt=parseInt(el.dataset.target); let c=0;
+          const t=setInterval(()=>{ c+=tgt/55; if(c>=tgt){c=tgt;clearInterval(t);} el.textContent=Math.floor(c).toLocaleString('pl-PL'); },28);
+        });
+        obs.disconnect();
+      }
+    });
+  },{threshold:.3});
+  const s=document.querySelector('.hero-stats');
+  if(s) obs.observe(s);
+}
+
+/* ── SKROT ADMINA: Ctrl+Shift+A ── */
+document.addEventListener('keydown', e=>{
+  if(e.ctrlKey && e.shiftKey && e.key==='A'){
+    e.preventDefault();
+    openAdmin();
+  }
+});
+
+/* ── CANVAS: floating ice particles ── */
+(function(){
+  const canvas=document.getElementById('bg-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+
+  function Pt(){
+    this.reset=function(){
+      this.x=Math.random()*W; this.y=Math.random()*H;
+      this.r=Math.random()*1.2+.2;
+      this.vx=(Math.random()-.5)*.18;
+      this.vy=-Math.random()*.3-.05;
+      this.a=Math.random()*.35+.05;
+      this.col=Math.random()>.6?'#5bb8e8':Math.random()>.5?'#a8d8f0':'#c8eeff';
+    };
+    this.reset();
+  }
+  for(let i=0;i<90;i++){ const p=new Pt(); p.y=Math.random()*H; pts.push(p); }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      ctx.save();
+      ctx.globalAlpha=p.a;
+      ctx.fillStyle=p.col;
+      ctx.shadowBlur=4; ctx.shadowColor=p.col;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-5||p.x<-5||p.x>W+5) p.reset();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
